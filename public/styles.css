@@ -3,12 +3,222 @@
 * {
   font-family: 'VT323', monospace;
   font-weight: lighter;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --main: #40f640;
+  --support: #ff4500;
+  --dark: #000;
+  --disabled: #ccc;
 }
 
 body {
-  background-color: rgb(9, 103, 9);
+  background-color: var(--dark);
+  color: var(--main);
+  font-size: 1.5rem;
+  padding: 20px;
 }
 
-.logo-text {
-  font-size: 5rem;
+#main-layout {
+  display: flex;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#landing-page-container {
+  flex: 2;
+}
+
+#console-wrapper {
+  flex: 1;
+  min-width: 300px;
+}
+
+#landing-page-container {
+  padding: 20px;
+  border: 1px double var(--main);
+  max-width: 800px;
+}
+
+#header {
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: 18px;
+  font-style: oblique;
+  margin-bottom: 10px;
+}
+.instructions {
+  font-size: 20px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+#header ul li {
+  font-size: 18px;
+}
+
+#header ul li span {
+  color: var(--support);
+}
+
+ul { 
+  list-style: none;
+}
+
+#file-transfer-wrapper {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px dashed var(--main);
+}
+
+#file-transfer-wrapper > label {
+  display: block;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+#file-transfer-wrapper input[type="text"],
+#file-transfer-wrapper input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px dashed var(--main);
+  font-size: 18px;
+  box-sizing: border-box;
+  background-color: transparent;
+  color: var(--main);
+  outline: none;
+  
+}
+
+#file-transfer-wrapper input[type="text"]:focus,
+#file-transfer-wrapper input[type="file"]:focus {
+  border: 1px solid var(--main);
+}
+
+#file-transfer-wrapper button {
+  padding: 12px 20px;
+  border: 1px solid var(--main);
+  background-color: transparent;
+  color: var(--main);
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 20px; 
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.5s ease-in-out;
+}
+
+#file-transfer-wrapper button:hover {
+  background-color: var(--main);
+  color: var(--dark);
+}
+
+#file-transfer-wrapper button:disabled {
+  border: 1px solid var(--disabled);
+  color: var(--disabled);
+  cursor: not-allowed;
+}
+
+#file-transfer-wrapper button:hover:disabled {
+  border: 1px solid var(--disabled);
+  background-color: transparent;
+  color: var(--disabled);
+}
+
+#file-selection-status {
+  color: var(--support);
+}
+
+div#stats, 
+a#download {
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+div.progress {
+  margin: 0 0 1em 0;
+}
+
+div.progress div.label {
+  display: inline-block;
+  font-weight: bold;
+  width: 8.2em;
+}
+
+progress {
+  width: calc(100% - 8.5em);
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 20px;
+  border: 1px dashed var(--main);
+  background: transparent;
+  overflow: hidden;
+}
+
+progress::-webkit-progress-bar {
+  background-color: transparent;
+  /* border: 1px dashed var(--main); */
+}
+
+progress::-webkit-progress-value {
+  background-color: var(--main);
+}
+
+#console-wrapper p {
+  padding-left: 10px;
+  text-align: center;
+}
+
+
+#console-display {
+  background-color: var(--main);
+  background-image: 
+    repeating-linear-gradient(
+      to bottom, 
+      rgba(0, 0, 0, 0.1) 0px, 
+      rgba(0, 0, 0, 0.1) 1px, 
+      transparent 2px, 
+      transparent 4px
+    );
+  color: var(--dark);
+  padding: 10px;
+  margin-top: 10px;
+  height: 150px;
+  overflow-y: auto;
+  white-space: pre;
+}
+/* WebKit browsers (Chrome, Edge, Safari) */
+#console-display::-webkit-scrollbar {
+  width: 10px;
+}
+
+#console-display::-webkit-scrollbar-track {
+  background: var(--dark);
+  border: 1px solid var(--main);
+}
+
+#console-display::-webkit-scrollbar-thumb {
+  background: var(--main);
+}
+
+#console-display::-webkit-scrollbar-thumb:hover {
+  background: var(--main);
+}
+
+.console-message {
+  margin-bottom: 5px;
 }

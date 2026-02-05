@@ -8,6 +8,84 @@
   <title>Færstrēam</title>
 </head>
 <body>
-  <h1 class="logo-text">Færstrēam</h1>
+  <div id="main-layout">
+    <div id="landing-page-container">
+      <div id="header">
+        <h1 class="title">Færstrēam</h1>
+        <p class="subtitle">Transfer files over to another user in real time.</p>
+        <h4 class="instructions">Instructions</h4>
+        <ul>
+          <li>1) The file is split into chunks which are then transferred via a <span>WebRTC RTC Data Channel</span>.</li>
+          <li>2) Send and receive progress is monitored using the HTML 5 <span>progress</span> element.</li>
+          <li>3) At the receiver end, file is reassembled using the <span>Blob API</span> and made available for download.</li>
+        </ul>
+      </div>
+      <div id="file-transfer-wrapper">
+        <label for="receiver-id">
+          Enter Recipient session ID:
+        </label>
+        <input 
+          type="text" 
+          id="receiver-id"
+        >
+        <br>
+
+        <label for="file-upload-input">
+          Upload File:
+        </label>
+        <input 
+          type="file" 
+          id="file-upload-input"
+          disabled
+        >
+        <span id="file-selection-status"></span>
+
+        <span id="file-selection-status"></span>
+        <br>
+        <button 
+          id="send-file-button"
+          disabled
+        >
+          Send
+        </button>
+        <button 
+          id="abort-file-button"
+          disabled
+        >
+          Stop
+        </button>
+        <br>
+        <br>
+        <div class="progress">
+          <div class="label">Send Progress: </div>
+          <progress
+            id="send-progress"
+            max="0"
+            value="0"
+          ></progress>
+        </div>
+        <div class="progress">
+          <div class="label">Receive Progress: </div>
+          <progress
+            id="receive-progress"
+            max="0"
+            value="0"
+          ></progress>
+        </div>
+      </div>
+      <div id="stats"></div>
+      <a id="download"></a>
+    </div>
+    <br>
+    <div id="console-wrapper">
+      <p class="title">Færstrēam Status Console</p>
+      <p
+        class="subtitle" 
+        id="session-id-display"
+      ></p>
+      <div id="console-display"></div>
+    </div>
+  </div>
+  
 </body>
 </html>
