@@ -54,6 +54,7 @@ body {
 }
 
 .subtitle {
+  color: var(--main);
   font-size: 18px;
   font-style: oblique;
   margin-bottom: 10px;
@@ -183,7 +184,6 @@ progress::-webkit-progress-value {
   text-align: center;
 }
 
-
 #console-display {
   background-color: var(--main);
   background-image: 
@@ -201,7 +201,7 @@ progress::-webkit-progress-value {
   overflow-y: auto;
   white-space: pre;
 }
-/* WebKit browsers (Chrome, Edge, Safari) */
+
 #console-display::-webkit-scrollbar {
   width: 10px;
 }
