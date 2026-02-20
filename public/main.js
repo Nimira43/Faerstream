@@ -1,5 +1,5 @@
 import * as uiUtils from './modules/uiUtils.js'
-import * as ws from './modules/ws.js'
+import * as ws from './modules/ws.js'  
 
 const userID = Math.round(Math.random() * 1000000)
 
