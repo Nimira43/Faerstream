@@ -37,8 +37,20 @@ function addConnection(ws, userId) {
   console.log('Total connected users: ' + connections.length)
 } 
 
-function handleMessage(data) {}
-function handleDisconnection(userId) {}
+function handleMessage(data) { }
+
+function handleDisconnection(userId) {
+  const connectionIndex = connections.findIndex(conn => conn.userId === userId)
+
+  if (connectionIndex === -1) {
+    console.log(`User: ${userId} is not found in connections array.`)
+    return
+  }
+
+  connections.splice(connectionIndex, 1)
+  console.log(`User ${userId} has been removed from connections.`)
+  console.log(`Total connected users: ${connections.length}.`)
+}
 
 server.listen(PORT, () => {
   console.log(`Server listening on Port: ${PORT}.`)
