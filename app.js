@@ -1,7 +1,6 @@
 import http from 'http'
 import express from 'express'
 import { WebSocketServer } from 'ws'
-import { URLSearchParams } from 'url'
 
 const connections = [
 
@@ -10,8 +9,8 @@ const connections = [
 const PORT = process.env.PORT || 8000
 const app = express()
 app.use(express.static('public'))
-
 const server = http.createServer(app)
+
 const wss = new WebSocketServer({ server })
 wss.on('connection', (ws, req) => handleConnection(ws, req))
 
