@@ -1,6 +1,7 @@
 let state = {
   userId: null,
-  userWebSocketConnection: null
+  userWebSocketConnection: null,
+  otherUserId: null
 }
 
 const setState = (newState) => {
@@ -16,4 +17,8 @@ export const setUserId = (userId) => {
 
 export const setWsConnection = (wsConnection) => {
   setState({userWebSocketConnection: wsConnection})
+}
+
+export const setOtherUserId = (otherUserId) => {
+  setState({otherUserId})
 }

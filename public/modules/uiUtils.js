@@ -13,6 +13,11 @@ const statsDiv = document.querySelector('div#stats')
 const downloadFileAnchorTag = document.querySelector('a#download')
 const statusMessage = document.querySelector('span#status')
 
+export const DOM = {
+  receiverIdInput, fileUploadInput
+}
+
+
 export function initialiseUI(userID) {
   userSessionIdElement.innerText = `Your session ID is: ${userID}`
   state.setUserId(userID)
@@ -32,8 +37,9 @@ export function logToCustomConsole(
   if (highlight) {
     messageElement.style.color = '#40f640'
     messageElement.style.backgroundColor = highlightColour
-    messageElement.style.fontWeight = 'bold'
-    messageElement.style.padding = '5px'
+    messageElement.style.fontWeight = 'lighter'
+    messageElement.style.paddingLeft = '5px'
+    messageElement.style.paddingRight = '5px'
     messageElement.style.borderRadius = '3px'
     messageElement.style.transition = 'background-color 0.5s ease'
   }

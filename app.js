@@ -2,14 +2,20 @@ import http from 'http'
 import express from 'express'
 import { WebSocketServer } from 'ws'
 
-const connections = [
-
-]
+const connections = []
 
 const PORT = process.env.PORT || 8000
 const app = express()
 app.use(express.static('public'))
+app.use(express.json())
+
 const server = http.createServer(app)
+
+app.post('/checkRecipient', (req, res) => {
+  const recipientId = Number(req.body.recipientId)
+  const exists = connections.some(conn => conn.userId === recipientId)
+  res.json({userExists: exists})
+})
 
 const wss = new WebSocketServer({ server })
 wss.on('connection', (ws, req) => handleConnection(ws, req))
