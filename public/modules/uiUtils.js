@@ -14,7 +14,10 @@ const downloadFileAnchorTag = document.querySelector('a#download')
 const statusMessage = document.querySelector('span#status')
 
 export const DOM = {
-  receiverIdInput, fileUploadInput
+  receiverIdInput, 
+  fileUploadInput, 
+  fileSelectionStatus,
+  sendFileBtn
 }
 
 
