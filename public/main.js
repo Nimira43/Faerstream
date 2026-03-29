@@ -35,3 +35,8 @@ function handlefileInputChange() {
   uiUtils.logToCustomConsole('You have added a file', constants.myColours.blue)
   uiUtils.DOM.sendFileBtn.disabled = false
 }
+
+uiUtils.DOM.sendFileBtn.addEventListener('click', () => {
+  uiUtils.DOM.abortFileBtn.disabled = false
+  uiUtils.DOM.sendFileBtn.disabled = true
+})

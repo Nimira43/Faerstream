@@ -6,10 +6,7 @@ export function registerSocketEvents(wsClientConnection) {
   state.setWsConnection(wsClientConnection)
   
   wsClientConnection.onopen = () => {
-    uiUtils.logToCustomConsole('You have connected to the WebSocket Server.')
-
-    // wsClientConnection.onmessage = handleMessage  
-    
+    uiUtils.logToCustomConsole('You have connected to the WebSocket Server.')    
     wsClientConnection.onclose = handleClose
     wsClientConnection.onerror = handleError
   }

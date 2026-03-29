@@ -17,9 +17,9 @@ export const DOM = {
   receiverIdInput, 
   fileUploadInput, 
   fileSelectionStatus,
-  sendFileBtn
+  sendFileBtn,
+  abortFileBtn
 }
-
 
 export function initialiseUI(userID) {
   userSessionIdElement.innerText = `Your session ID is: ${userID}`
