@@ -2,6 +2,7 @@ import * as uiUtils from './modules/uiUtils.js'
 import * as ws from './modules/ws.js'  
 import * as ajax from './modules/ajax.js'
 import * as constants from './modules/constants.js'
+import * as webrtc from './modules/webRTCHandler.js'
 
 const userID = Math.round(Math.random() * 1000000)
 uiUtils.initialiseUI(userID)
@@ -39,4 +40,6 @@ function handlefileInputChange() {
 uiUtils.DOM.sendFileBtn.addEventListener('click', () => {
   uiUtils.DOM.abortFileBtn.disabled = false
   uiUtils.DOM.sendFileBtn.disabled = true
+
+  webrtc.createAndSendOffer()
 })
