@@ -19,3 +19,15 @@ function handleClose() {
 function handleError() {
   uiUtils.logToCustomConsole('An error was thrown', null, true, constants.myColours.orange)
 }
+
+export function sendOffer(offer) {
+  const message = {
+    type: 'OFFER',
+    date: {
+      offer,
+      senderId: state.getState().userId,
+      otherUserId: state.getState().otherUserId
+    }
+  }
+  state.getState().userWebSocketConnection.send(JSON.stringify(message))
+}

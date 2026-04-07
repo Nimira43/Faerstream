@@ -22,3 +22,7 @@ export const setWsConnection = (wsConnection) => {
 export const setOtherUserId = (otherUserId) => {
   setState({otherUserId})
 }
+
+export const getState = () => {
+  return state
+}

@@ -28,11 +28,12 @@ export async function createAndSendOffer() {
   uiUtils.logToCustomConsole(`Created data channel.`)
 
   const offer = await pc.createOffer()
-  uiUtils.logToCustomConsole(`Created offer'`)
+  uiUtils.logToCustomConsole(`Created offer.`)
 
   await pc.setLocalDescription(offer)
   uiUtils.logToCustomConsole(`Local description set.`)
 
+  ws.sendOffer(offer)
   uiUtils.logToCustomConsole(`WebRTC offer sent.`)
 }
 
