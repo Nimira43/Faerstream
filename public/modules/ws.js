@@ -23,7 +23,7 @@ function handleError() {
 export function sendOffer(offer) {
   const message = {
     type: 'OFFER',
-    date: {
+    data: {
       offer,
       senderId: state.getState().userId,
       otherUserId: state.getState().otherUserId

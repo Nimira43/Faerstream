@@ -42,7 +42,17 @@ function addConnection(ws, userId) {
   console.log('Total connected users: ' + connections.length)
 } 
 
-function handleMessage(data) { }
+function handleMessage(data) { 
+  try {
+    let message = JSON.parse(data)
+    signalMessageToOtherUser(message)
+  } catch (error) {
+    console.log('Failed to parse the WS message.', error)
+    return
+  }
+}
+
+function signalMessageToOtherUser(message) {}
 
 function handleDisconnection(userId) {
   const connectionIndex = connections.findIndex(conn => conn.userId === userId)
