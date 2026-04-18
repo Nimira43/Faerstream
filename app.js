@@ -52,7 +52,10 @@ function handleMessage(data) {
   }
 }
 
-function signalMessageToOtherUser(message) {}
+function signalMessageToOtherUser(message) {
+  const { otherUserId } = message.data
+  sendWebSocketMessageToUser(otherUserId, message)
+}
 
 function handleDisconnection(userId) {
   const connectionIndex = connections.findIndex(conn => conn.userId === userId)
@@ -65,6 +68,17 @@ function handleDisconnection(userId) {
   connections.splice(connectionIndex, 1)
   console.log(`User ${userId} has been removed from connections.`)
   console.log(`Total connected users: ${connections.length}.`)
+}
+
+function sendWebSocketMessageToUser(sendToUserId, message) {
+  const userConnection = connections.find(connObj => connObj.userId === sendToUserId)
+
+  if (userConnection) {
+    userConnection.wsConnection.send(JSON.stringify(message))
+    console.log(`Message sent to ${sendToUserId}`)
+  } else {
+    console.log(`User ${sendToUserId} not found.`)
+  }
 }
 
 server.listen(PORT, () => {
