@@ -1,6 +1,7 @@
 import * as uiUtils from './uiUtils.js'
 import * as constants from './constants.js'
 import * as state from './state.js'
+import * as ws from './ws.js'
 
 let pc
 let sendChannel
@@ -99,4 +100,26 @@ function registerDataChannelEventListeners(dataChannel) {
 function closePeerConnection() {
   pc.close()
   uiUtils.log('Your peer connection has been closed.', constants.myColours.orange)
+}
+
+export async function handleOffer(data) {
+  uiUtils.logToCustomConsole('WebRTC offer received.')
+  state.setOtherUserId(data.senderId)
+  
+  createPeerConnection()
+  uiUtils.logToCustomConsole('Peer connection created.')
+
+  createDataChannel(false)
+  
+  pc.setRemoteDescription(data.offer)
+  uiUtils.logToCustomConsole('Remote description updated with the offer.')
+  
+  const answer = await pc.createAnswer()
+  uiUtils.logToCustomConsole('Answer created')
+
+  await pc.setLocalDescription(answer)
+  uiUtils.logToCustomConsole('Local description updated with the answer.')
+
+  ws.sendAnswer(answer)
+  uiUtils.logToCustomConsole('Answer sent to the user sending the file.')
 }

@@ -77,7 +77,7 @@ function sendWebSocketMessageToUser(sendToUserId, message) {
     userConnection.wsConnection.send(JSON.stringify(message))
     console.log(`Message sent to ${sendToUserId}`)
   } else {
-    console.log(`User ${sendToUserId} not found.`)
+    console.log(`User ${sendToUserId} not found. `)
   }
 }
 

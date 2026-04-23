@@ -1,12 +1,14 @@
 import * as state from './state.js'
 import * as uiUtils from './uiUtils.js'
 import * as constants from './constants.js'
+import * as webrtc from './webRTCHandler.js'
 
 export function registerSocketEvents(wsClientConnection) {
   state.setWsConnection(wsClientConnection)
   
   wsClientConnection.onopen = () => {
     uiUtils.logToCustomConsole('You have connected to the WebSocket Server.')    
+    wsClientConnection.onmessage = handleMessage
     wsClientConnection.onclose = handleClose
     wsClientConnection.onerror = handleError
   }
@@ -30,4 +32,16 @@ export function sendOffer(offer) {
     }
   }
   state.getState().userWebSocketConnection.send(JSON.stringify(message))
+}
+
+function handleMessage(incomingMessageEventObject) {
+  const message = JSON.parse(incomingMessageEventObject.data)
+
+  switch (message.type) {
+    case 'OFFER':
+      webrtc.handleOffer(message.data)
+      break
+    default:
+      console.log('Unknown data type, ', message.type )
+  }
 }
