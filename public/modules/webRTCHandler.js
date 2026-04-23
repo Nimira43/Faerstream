@@ -123,3 +123,9 @@ export async function handleOffer(data) {
   ws.sendAnswer(answer)
   uiUtils.logToCustomConsole('Answer sent to the user sending the file.')
 }
+
+export async function handleAnswer(data) {
+  uiUtils.logToCustomConsole('Answer received.')
+  await pc.setRemoteDescription(data.answer)
+  uiUtils.logToCustomConsole('Remote description updated with the answer.')
+}

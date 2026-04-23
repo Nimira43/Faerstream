@@ -34,12 +34,26 @@ export function sendOffer(offer) {
   state.getState().userWebSocketConnection.send(JSON.stringify(message))
 }
 
+export function sendAnswer(answer) {
+  const message = {
+    type: 'ANSWER',
+    data: {
+      offer,
+      otherUserId: state.getState().otherUserId
+    }
+  }
+  state.getState().userWebSocketConnection.send(JSON.stringify(message))
+}
+
 function handleMessage(incomingMessageEventObject) {
   const message = JSON.parse(incomingMessageEventObject.data)
 
   switch (message.type) {
     case 'OFFER':
       webrtc.handleOffer(message.data)
+      break
+    case 'ANSWER':
+      webrtc.handleAnswer(message.data)
       break
     default:
       console.log('Unknown data type, ', message.type )
