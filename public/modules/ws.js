@@ -45,6 +45,17 @@ export function sendAnswer(answer) {
   state.getState().userWebSocketConnection.send(JSON.stringify(message))
 }
 
+export function sendIceCandidate(candidate) {
+  const message = {
+    type: 'ICE',
+    data: {
+      candidate,
+      otherUserId: state.getState().otherUserId
+    }
+  }
+  state.getState().userWebSocketConnection.send(JSON.stringify(message))
+}
+
 function handleMessage(incomingMessageEventObject) {
   const message = JSON.parse(incomingMessageEventObject.data)
 
@@ -54,6 +65,9 @@ function handleMessage(incomingMessageEventObject) {
       break
     case 'ANSWER':
       webrtc.handleAnswer(message.data)
+      break
+    case 'ICE':
+      webrtc.handleIceCandiates(message.data.candidate)
       break
     default:
       console.log('Unknown data type, ', message.type )

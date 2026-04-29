@@ -46,6 +46,7 @@ function createPeerConnection() {
 
     if (event.candidate) {
       console.log('ICE: ', event.candidate)
+      ws.sendIceCandidate(event.candidate)
     }
   }
 
@@ -128,4 +129,18 @@ export async function handleAnswer(data) {
   uiUtils.logToCustomConsole('Answer received.')
   await pc.setRemoteDescription(data.answer)
   uiUtils.logToCustomConsole('Remote description updated with the answer.')
+}
+
+export function handleIceCandiates(iceCandidate) {
+  if (pc.remoteDescription) {
+    try {
+      pc.addIceCandidate(iceCandidate)
+      uiUtils.logToCustomConsole('Remote ICE added.', null, true, constants.myColours.blue)
+    } catch (error) {
+      console.log('Error trying to add an ice candidate to the PC object.', error)
+    } 
+  } else {
+    iceCandidatesReceivedBuffer.push(iceCandidate)
+    uiUtils.logToCustomConsole('Remote ICEadded to a temp buffer.')
+  }
 }
