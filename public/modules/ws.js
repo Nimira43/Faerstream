@@ -38,7 +38,7 @@ export function sendAnswer(answer) {
   const message = {
     type: 'ANSWER',
     data: {
-      offer,
+      answer,
       otherUserId: state.getState().otherUserId
     }
   }

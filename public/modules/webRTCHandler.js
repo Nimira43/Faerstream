@@ -12,10 +12,10 @@ const WebRTCConfigurations = {
   iceServers: [
     {
       urls: [
-        'stun:stun.1.google.com:19302',
-        'stun:stun2.1.google.com:19302',
-        'stun:stun3.1.google.com:19302',
-        'stun:stun4.1.google.com:19302',
+        'stun:stun.l.google.com:19302',
+        'stun:stun2.l.google.com:19302',
+        'stun:stun3.l.google.com:19302',
+        'stun:stun4.l.google.com:19302',
       ]
     }
   ]
@@ -72,7 +72,7 @@ function createDataChannel(isSender) {
     pc.ondatachannel = (e) => {
       receiveChannel = e.channel
       registerDataChannelEventListeners(receiveChannel)
-      uiUtils.logToCustomConsole('Successfully registered ondatachannel listener on you')
+      uiUtils.logToCustomConsole('Successfully registered ondatachannel listener on your PC object.')
     }
   }
 }
@@ -82,7 +82,7 @@ function registerDataChannelEventListeners(dataChannel) {
     console.log('An error occured on the Data Channel: ', e)
   })
   dataChannel.addEventListener('close', (e) => {
-    console.log('The close event was fired on your data channel object.')
+    console.log('The close event was fired on your Data Channel object.')
   })
   dataChannel.addEventListener('open', (e) => {
     dataChannel.maxMessageSize = pc.sctp.maxMessageSize
@@ -92,7 +92,7 @@ function registerDataChannelEventListeners(dataChannel) {
   })
 
   if (receiveChannel) {
-    dataChannel.addEventListener('message', (eventDate) => {
+    dataChannel.addEventListener('message', (eventData) => {
       
     })
   }
@@ -113,6 +113,7 @@ export async function handleOffer(data) {
   createDataChannel(false)
   
   pc.setRemoteDescription(data.offer)
+  addIceCandidatesInBuffer()
   uiUtils.logToCustomConsole('Remote description updated with the offer.')
   
   const answer = await pc.createAnswer()
@@ -128,6 +129,7 @@ export async function handleOffer(data) {
 export async function handleAnswer(data) {
   uiUtils.logToCustomConsole('Answer received.')
   await pc.setRemoteDescription(data.answer)
+  addIceCandidatesInBuffer()
   uiUtils.logToCustomConsole('Remote description updated with the answer.')
 }
 
@@ -141,6 +143,14 @@ export function handleIceCandiates(iceCandidate) {
     } 
   } else {
     iceCandidatesReceivedBuffer.push(iceCandidate)
-    uiUtils.logToCustomConsole('Remote ICEadded to a temp buffer.')
+    uiUtils.logToCustomConsole('Remote ICE added to a temp buffer.')
   }
+}
+
+async function addIceCandidatesInBuffer() {
+  for (const candidate of iceCandidatesReceivedBuffer) {
+    await pc.addIceCandidate(candidate)
+    uiUtils.logToCustomConsole('Remote ICE transferred from buffer to PC object.')
+  }
+  iceCandidatesReceivedBuffer.splice(0, iceCandidatesReceivedBuffer.length)
 }
