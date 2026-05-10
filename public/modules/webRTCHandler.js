@@ -2,6 +2,7 @@ import * as uiUtils from './uiUtils.js'
 import * as constants from './constants.js'
 import * as state from './state.js'
 import * as ws from './ws.js'
+import * as fileHandler from './fileHandler.js'
 
 let pc
 let sendChannel
@@ -89,6 +90,11 @@ function registerDataChannelEventListeners(dataChannel) {
     console.log('Data Channel has been opened. You are now ready to send/receive files over your Data Channel.')
     console.log('PC object: ', pc)
     console.log('Data Channel object: ', dataChannel)
+
+    if (sendChannel) {
+      fileHandler.sendFile(sendChannel)  
+    }
+    
   })
 
   if (receiveChannel) {

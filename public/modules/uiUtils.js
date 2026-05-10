@@ -18,7 +18,8 @@ export const DOM = {
   fileUploadInput, 
   fileSelectionStatus,
   sendFileBtn,
-  abortFileBtn
+  abortFileBtn,
+  sendProgress
 }
 
 export function initialiseUI(userID) {
