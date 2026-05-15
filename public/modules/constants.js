@@ -5,3 +5,7 @@ export const myColours = {
   yellow: '#ffd700',
   blue: '#0c3d97'
 }
+
+export const FILE_CONFIG = {
+  CHUNK_SIZE: 262144
+}
