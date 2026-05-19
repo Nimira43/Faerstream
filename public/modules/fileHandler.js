@@ -30,14 +30,24 @@ export function sendFile(senderDataChannel) {
   const file = uiUtils.DOM.fileUploadInput.files[0]
   console.log('File selected: ', uiUtils.DOM.fileUploadInput.files)
   uiUtils.DOM.sendProgress.max = file.size
-  uiUtils.DOM.sendProgress.value = file.size / 2
 
   fileReader = new FileReader()
   fileReader.addEventListener('error', error => console.error('Error reading file:', error))
   fileReader.addEventListener('abort', event => console.log('File reading aborted:', event))
   fileReader.addEventListener('load', readerLoadEvent => {
     console.log('File reader onload event:', readerLoadEvent)
+    console.log(senderDataChannel.bufferedAmount, ' === bytes buffered in the send queue.')
     senderDataChannel.send(readerLoadEvent.target.result)
+    console.log('Size of chunk: ', readerLoadEvent.target.result.byteLength)
+    offset += readerLoadEvent.target.result.byteLength
+    uiUtils.DOM.sendProgress.value = offset
+
+    if (offset < file.size) {
+      readChunk(offset)
+    } else {
+      console.log(`End of File.`)
+      uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
+    }
   })
 
   const chunkSize = Math.min(
