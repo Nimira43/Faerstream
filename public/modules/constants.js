@@ -1,3 +1,6 @@
+const lowerWatermark = 1024 * 1024 * 5
+const highWatermark =  lowerWatermark * 2
+
 export const myColours = {
   orange: '#ff4500',
   green: '#40f640',
@@ -7,5 +10,7 @@ export const myColours = {
 }
 
 export const FILE_CONFIG = {
-  CHUNK_SIZE: 262144
+  CHUNK_SIZE: 262144,
+  LOWER_THRESHOLD: lowerWatermark,
+  UPPER_THRESHOLD: highWatermark
 }

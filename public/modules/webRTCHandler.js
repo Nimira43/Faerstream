@@ -93,14 +93,15 @@ function registerDataChannelEventListeners(dataChannel) {
 
     if (sendChannel) {
       fileHandler.sendFile(sendChannel)  
-    }
-    
+    } 
+  })
+
+  dataChannel.addEventListener('bufferedamountlow', () => {
+    console.log('Buffered amount is low. You can send more data now.')
   })
 
   if (receiveChannel) {
-    dataChannel.addEventListener('message', (eventData) => {
-      
-    })
+    dataChannel.addEventListener('message', (eventData) => {})
   }
 }
 
