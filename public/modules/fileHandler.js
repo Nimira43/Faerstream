@@ -2,6 +2,9 @@ import * as uiUtils from './uiUtils.js'
 import * as constants from './constants.js'
 
 let fileReader
+let receiveChunks = []
+let totalBytesReceived = 0
+let fileMetadata = null
 
 // Option 3 - Working File Reader API 
 export function sendFile(senderDataChannel) {
@@ -84,4 +87,20 @@ export function sendFile(senderDataChannel) {
   })
 
   readChunk(0)
+}
+
+export function receiveFile(messageEventObject) {
+  const receivedData = messageEventObject.data
+  if (!fileMetadata) {
+    try {
+      fileMetadata = JSON.parse(messageEventObject.data)
+      uiUtils.logToCustomConsole('Received file metadata.')
+      uiUtils.DOM.receiveProgress.max = fileMetadata.size
+      return
+    } catch (e) {
+      console.error('Error parsing metadata: ', e)
+      return
+    }
+  }
+
 }

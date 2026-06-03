@@ -19,7 +19,8 @@ export const DOM = {
   fileSelectionStatus,
   sendFileBtn,
   abortFileBtn,
-  sendProgress
+  sendProgress,
+  receiveProgress
 }
 
 export function initialiseUI(userID) {
