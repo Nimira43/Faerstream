@@ -20,7 +20,9 @@ export const DOM = {
   sendFileBtn,
   abortFileBtn,
   sendProgress,
-  receiveProgress
+  receiveProgress,
+  statsDiv,
+  downloadFileAnchorTag
 }
 
 export function initialiseUI(userID) {

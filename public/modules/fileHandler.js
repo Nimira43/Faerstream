@@ -103,4 +103,26 @@ export function receiveFile(messageEventObject) {
     }
   }
 
+  receiveChunks.push(receivedData)
+  totalBytesReceived += receivedData.byteLength
+  uiUtils.DOM.statsDiv.innerHTML =
+    `Received ${totalBytesReceived} bytes of ${fileMetadata.size} - ${Math.round((totalBytesReceived / fileMetadata.size) * 100)}%`
+  uiUtils.DOM.receiveProgress.value = totalBytesReceived
+
+  if (totalBytesReceived === fileMetadata.size) {
+    uiUtils.logToCustomConsole('All chunks received. Reassembling file.')
+
+    const fileBlobObject = new Blob(receiveChunks, {type: fileMetadata.type})
+
+    const downloadURL = URL.createObjectURL(fileBlobObject)
+
+    uiUtils.DOM.downloadFileAnchorTag.href = downloadURL
+    uiUtils.DOM.downloadFileAnchorTag.download = fileMetadata.name
+    uiUtils.DOM.downloadFileAnchorTag.textContent =
+      `Click to download '${fileMetadata.name}' (${fileMetadata.size} bytes)`
+    uiUtils.DOM.downloadFileAnchorTag.style.display = 'block'
+    uiUtils.DOM, statsDiv.innerHTML =
+      `<strong>Download complete</strong>`
+    uiUtils.logToCustomConsole('File sucessfully received.', constants.myColours.orange)
+  }
 }
