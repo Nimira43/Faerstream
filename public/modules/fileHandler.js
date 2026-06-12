@@ -93,8 +93,11 @@ export function receiveFile(messageEventObject) {
   const receivedData = messageEventObject.data
   if (!fileMetadata) {
     try {
-      fileMetadata = JSON.parse(messageEventObject.data)
+      fileMetadata = JSON.parse(receivedData)
       uiUtils.logToCustomConsole('Received file metadata.')
+      console.log('File meta object: ', fileMetadata)
+      const encode = new TextEncoder().encode(receivedData)
+      console.log('Size of mesage received: ', encode.length)
       uiUtils.DOM.receiveProgress.max = fileMetadata.size
       return
     } catch (e) {
@@ -121,8 +124,8 @@ export function receiveFile(messageEventObject) {
     uiUtils.DOM.downloadFileAnchorTag.textContent =
       `Click to download '${fileMetadata.name}' (${fileMetadata.size} bytes)`
     uiUtils.DOM.downloadFileAnchorTag.style.display = 'block'
-    uiUtils.DOM, statsDiv.innerHTML =
+    uiUtils.DOM.statsDiv.innerHTML =
       `<strong>Download complete</strong>`
-    uiUtils.logToCustomConsole('File sucessfully received.', constants.myColours.orange)
+    uiUtils.logToCustomConsole('File successfully received.', constants.myColours.orange)
   }
 }
