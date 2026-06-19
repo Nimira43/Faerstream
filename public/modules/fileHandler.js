@@ -1,5 +1,6 @@
 import * as uiUtils from './uiUtils.js'
 import * as constants from './constants.js'
+import * as webrtc from './webRTCHandler.js'
 
 let fileReader
 let receiveChunks = []
@@ -50,6 +51,7 @@ export function sendFile(senderDataChannel) {
     } else {
       console.log(`End of File.`)
       uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
+      webrtc.closeDataChannel(senderDataChannel)
     }
   })
 
