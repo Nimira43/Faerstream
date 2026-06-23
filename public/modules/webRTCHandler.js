@@ -84,7 +84,8 @@ function registerDataChannelEventListeners(dataChannel) {
   })
   dataChannel.addEventListener('close', (e) => {
     console.log('The close event was fired on your Data Channel object.')
-    closePeerConnection()
+    closePeerConnection(dataChannel) 
+
   })
   dataChannel.addEventListener('open', (e) => {
     dataChannel.maxMessageSize = pc.sctp.maxMessageSize
@@ -160,9 +161,19 @@ async function addIceCandidatesInBuffer() {
   iceCandidatesReceivedBuffer.splice(0, iceCandidatesReceivedBuffer.length)
 }
 
-function closePeerConnection() {
+function closePeerConnection(dataChannel) {
   pc.close()
+  pc = null
+  dataChannel = null
+
+  if (fileHandler.receivedChunks.length > 0) {
+    fileHandler.receivedChunks.length = 0
+    console.log('receivedChunks array rest to zero.')
+  }
+ 
   uiUtils.logToCustomConsole('Your peer connection has been closed.', constants.myColours.orange)
+  console.log('Final PC Object: ', pc)
+  console.log('Final DC Object: ', dataChannel)
 }
 
 export function closeDataChannel(dataChannel) {

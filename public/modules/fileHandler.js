@@ -3,7 +3,7 @@ import * as constants from './constants.js'
 import * as webrtc from './webRTCHandler.js'
 
 let fileReader
-let receiveChunks = []
+export let receivedChunks = []
 let totalBytesReceived = 0
 let fileMetadata = null
 
@@ -108,7 +108,7 @@ export function receiveFile(messageEventObject) {
     }
   }
 
-  receiveChunks.push(receivedData)
+  receivedChunks.push(receivedData)
   totalBytesReceived += receivedData.byteLength
   uiUtils.DOM.statsDiv.innerHTML =
     `Received ${totalBytesReceived} bytes of ${fileMetadata.size} - ${Math.round((totalBytesReceived / fileMetadata.size) * 100)}%`
@@ -117,7 +117,7 @@ export function receiveFile(messageEventObject) {
   if (totalBytesReceived === fileMetadata.size) {
     uiUtils.logToCustomConsole('All chunks received. Reassembling file.')
 
-    const fileBlobObject = new Blob(receiveChunks, {type: fileMetadata.type})
+    const fileBlobObject = new Blob(receivedChunks, {type: fileMetadata.type})
 
     const downloadURL = URL.createObjectURL(fileBlobObject)
 
@@ -129,5 +129,9 @@ export function receiveFile(messageEventObject) {
     uiUtils.DOM.statsDiv.innerHTML =
       `<strong>Download complete</strong>`
     uiUtils.logToCustomConsole('File successfully received.', constants.myColours.orange)
+    
+    receivedChunks = []
+    totalBytesReceived = 0
+    fileMetadata = null
   }
 }
