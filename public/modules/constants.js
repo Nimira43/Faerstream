@@ -2,7 +2,7 @@ const lowerWatermark = 1024 * 1024 * 5
 const highWatermark =  lowerWatermark * 2
 
 export const myColours = {
-  orange: '#ff4500',
+  orange: '#e23c00',
   green: '#40f640',
   darkGreen: '#0c7b0c',
   yellow: '#ffd700',

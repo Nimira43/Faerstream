@@ -10,6 +10,9 @@ let fileMetadata = null
 // Option 3 - Working File Reader API 
 export function sendFile(senderDataChannel) {
   uiUtils.logToCustomConsole('Sending file...')
+  uiUtils.DOM.abortFileBtn.addEventListener('click', () => {
+    webrtc.closeDataChannel(senderDataChannel)
+  }, {once: true})
   
   const file = uiUtils.DOM.fileUploadInput.files[0]
   console.log('File selected: ', uiUtils.DOM.fileUploadInput.files)
@@ -47,7 +50,7 @@ export function sendFile(senderDataChannel) {
     } 
 
     if (offset < file.size && !waitingToDrain) {
-      readChunk(offset)
+      readChunk()
     } else {
       console.log(`End of File.`)
       uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
@@ -65,7 +68,7 @@ export function sendFile(senderDataChannel) {
   senderDataChannel.bufferedAmountLowThreshold = constants.FILE_CONFIG.LOWER_THRESHOLD
   let waitingToDrain = false
 
-  function readChunk(offset) {
+  function readChunk() {
     console.log('Reading chunk starting at offset:', offset)
 
     if (senderDataChannel.bufferedAmount >= upperThreshold) {
@@ -84,11 +87,12 @@ export function sendFile(senderDataChannel) {
     if (waitingToDrain) {
       waitingToDrain = false
       console.log('bufferedamount event fired, resume sending...')
+      console.log('Offest value: ', offset)
       readChunk()
     }
   })
 
-  readChunk(0)
+  readChunk()
 }
 
 export function receiveFile(messageEventObject) {

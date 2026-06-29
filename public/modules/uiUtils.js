@@ -11,7 +11,6 @@ const sendProgress = document.querySelector('progress#send-progress')
 const receiveProgress = document.querySelector('progress#receive-progress')
 const statsDiv = document.querySelector('div#stats')
 const downloadFileAnchorTag = document.querySelector('a#download')
-const statusMessage = document.querySelector('span#status')
 
 export const DOM = {
   receiverIdInput, 
@@ -53,4 +52,8 @@ export function logToCustomConsole(
 
   consoleDisplay.appendChild(messageElement)
   consoleDisplay.scrollTop = consoleDisplay.scrollHeight
+}
+
+export function terminationUI() {
+  alert('Refresh the page again if you want to send another file.')
 }

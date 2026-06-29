@@ -174,6 +174,8 @@ function closePeerConnection(dataChannel) {
   uiUtils.logToCustomConsole('Your peer connection has been closed.', constants.myColours.orange)
   console.log('Final PC Object: ', pc)
   console.log('Final DC Object: ', dataChannel)
+
+  uiUtils.terminationUI()
 }
 
 export function closeDataChannel(dataChannel) {
