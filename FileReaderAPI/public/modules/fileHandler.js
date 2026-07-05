@@ -7,7 +7,7 @@ export let receivedChunks = []
 let totalBytesReceived = 0
 let fileMetadata = null
 
-// Option 4 - Sending Blobs Directly 
+// Option 3 - Working File Reader API 
 export function sendFile(senderDataChannel) {
   uiUtils.logToCustomConsole('Sending file...')
   uiUtils.DOM.abortFileBtn.addEventListener('click', () => {
@@ -31,6 +31,33 @@ export function sendFile(senderDataChannel) {
 
   uiUtils.DOM.sendProgress.max = file.size
 
+  fileReader = new FileReader()
+  fileReader.addEventListener('error', error => console.error('Error reading file:', error))
+  fileReader.addEventListener('abort', event => console.log('File reading aborted:', event))
+  fileReader.addEventListener('load', readerLoadEvent => {
+    
+    const buffer = readerLoadEvent.target.result 
+    console.log(senderDataChannel.bufferedAmount, ' === bytes buffered in the send queue.')
+    console.log('Array buffer chunk: ', buffer)
+
+    try {
+      senderDataChannel.send(buffer)
+      offset += readerLoadEvent.target.result.byteLength
+      uiUtils.DOM.sendProgress.value = offset
+    } catch (e) {
+      console.log('Error reading and sending chunks: ', e)
+      return
+    } 
+
+    if (offset < file.size && !waitingToDrain) {
+      readChunk()
+    } else {
+      console.log(`End of File.`)
+      uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
+      webrtc.closeDataChannel(senderDataChannel)
+    }
+  })
+
   const chunkSize = Math.min(
     constants.FILE_CONFIG.CHUNK_SIZE,
     senderDataChannel.maxMessageSize
@@ -50,24 +77,10 @@ export function sendFile(senderDataChannel) {
       return
     }
 
-    const blobChunk = file.slice(offset, offset + chunkSize)
+    const chunk = file.slice(offset, offset + chunkSize)
 
-    try {
-      senderDataChannel.send(blobChunk)
-      offset += blobChunk.size
-      uiUtils.DOM.sendProgress.value = offset
-    } catch (e) {
-      console.log('Error reading and sending chunks: ', e)
-      return
-    } 
-
-    if (offset < file.size && !waitingToDrain) {
-      readChunk()
-    } else {
-      console.log(`End of File.`)
-      uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
-      webrtc.closeDataChannel(senderDataChannel)
-    }
+    fileReader.readAsArrayBuffer(chunk)
+    console.log('Blob Chunk: ', chunk)
   }
 
   senderDataChannel.addEventListener('bufferedamountlow', () => {
