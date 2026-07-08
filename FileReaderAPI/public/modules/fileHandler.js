@@ -113,7 +113,7 @@ export function receiveFile(messageEventObject) {
   }
 
   receivedChunks.push(receivedData)
-  totalBytesReceived += receivedData.byteLength
+  totalBytesReceived += receivedData.size
   uiUtils.DOM.statsDiv.innerHTML =
     `Received ${totalBytesReceived} bytes of ${fileMetadata.size} - ${Math.round((totalBytesReceived / fileMetadata.size) * 100)}%`
   uiUtils.DOM.receiveProgress.value = totalBytesReceived

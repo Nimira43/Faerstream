@@ -84,6 +84,8 @@ export function sendFile(senderDataChannel) {
 
 export function receiveFile(messageEventObject) {
   const receivedData = messageEventObject.data
+  console.log('Received Data: ', receivedData )
+
   if (!fileMetadata) {
     try {
       fileMetadata = JSON.parse(receivedData)

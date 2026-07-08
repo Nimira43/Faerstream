@@ -72,6 +72,7 @@ function createDataChannel(isSender) {
   } else {
     pc.ondatachannel = (e) => {
       receiveChannel = e.channel
+      receiveChannel.binaryType ='blob'
       registerDataChannelEventListeners(receiveChannel)
       uiUtils.logToCustomConsole('Successfully registered ondatachannel listener on your PC object.')
     }
