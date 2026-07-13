@@ -2,9 +2,6 @@ import * as uiUtils from './uiUtils.js'
 import * as constants from './constants.js'
 import * as webrtc from './webRTCHandler.js'
 
-const pako = window.pako
-console.log(pako)
-
 let fileReader
 export let receivedChunks = []
 let totalBytesReceived = 0
