@@ -72,7 +72,7 @@ function createDataChannel(isSender) {
   } else {
     pc.ondatachannel = (e) => {
       receiveChannel = e.channel
-      receiveChannel.binaryType ='blob'
+      receiveChannel.binaryType = 'blob'
       registerDataChannelEventListeners(receiveChannel)
       uiUtils.logToCustomConsole('Successfully registered ondatachannel listener on your PC object.')
     }
@@ -169,7 +169,7 @@ function closePeerConnection(dataChannel) {
 
   if (fileHandler.receivedChunks.length > 0) {
     fileHandler.receivedChunks.length = 0
-    console.log('receivedChunks array rest to zero.')
+    console.log('receivedChunks array reset to zero.')
   }
  
   uiUtils.logToCustomConsole('Your peer connection has been closed.', constants.myColours.orange)

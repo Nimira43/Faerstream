@@ -10,7 +10,6 @@ export let receivedChunks = []
 let totalBytesReceived = 0
 let fileMetadata = null
 
-// Option 4 - Sending Blobs Directly 
 export function sendFile(senderDataChannel) {
   uiUtils.logToCustomConsole('Sending file...')
   uiUtils.DOM.abortFileBtn.addEventListener('click', () => {
@@ -34,6 +33,37 @@ export function sendFile(senderDataChannel) {
 
   uiUtils.DOM.sendProgress.max = file.size
 
+  fileReader = new FileReader()
+  fileReader.addEventListener('error', error => console.error('Error reading file:', error))
+  fileReader.addEventListener('abort', event => console.log('File reading aborted:', event))
+  fileReader.addEventListener('load', readerLoadEvent => {
+    const arrayBuffer = readerLoadEvent.target.result
+    const uInt8ArrayChunk = new Uint8Array(arrayBuffer)
+    console.log(senderDataChannel.bufferedAmount, ' === bytes buffered in the send queue.')
+
+    const compressedChunk = pako.deflate(uInt8ArrayChunk)
+    console.log('Compressed chunk using pako: ', compressedChunk)
+    console.log('Original chunk size: ', uInt8ArrayChunk.byteLength)
+    console.log('Compressed chunk size: ', compressedChunk.length)
+
+    try {
+      senderDataChannel.send(compressedChunk.buffer)
+      offset += readerLoadEvent.target.result.byteLength
+      uiUtils.DOM.sendProgress.value = offset
+    } catch (e) {
+      console.log('Error reading and sending chunks: ', e)
+      return
+    } 
+
+    if (offset < file.size && !waitingToDrain) {
+      readChunk()
+    } else {
+      console.log(`End of File.`)
+      uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
+      webrtc.closeDataChannel(senderDataChannel)
+    }
+  })
+
   const chunkSize = Math.min(
     constants.FILE_CONFIG.CHUNK_SIZE,
     senderDataChannel.maxMessageSize
@@ -53,24 +83,10 @@ export function sendFile(senderDataChannel) {
       return
     }
 
-    const blobChunk = file.slice(offset, offset + chunkSize)
+    const chunk = file.slice(offset, offset + chunkSize)
 
-    try {
-      senderDataChannel.send(blobChunk)
-      offset += blobChunk.size
-      uiUtils.DOM.sendProgress.value = offset
-    } catch (e) {
-      console.log('Error reading and sending chunks: ', e)
-      return
-    } 
-
-    if (offset < file.size && !waitingToDrain) {
-      readChunk()
-    } else {
-      console.log(`End of File.`)
-      uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
-      webrtc.closeDataChannel(senderDataChannel)
-    }
+    fileReader.readAsArrayBuffer(chunk)
+    console.log('Blob Chunk: ', chunk)
   }
 
   senderDataChannel.addEventListener('bufferedamountlow', () => {
@@ -85,9 +101,9 @@ export function sendFile(senderDataChannel) {
   readChunk()
 }
 
-export function receiveFile(messageEventObject) {
+export async function receiveFile(messageEventObject) {
   const receivedData = messageEventObject.data
-  console.log('Received Data: ', receivedData )
+  console.log('Received Data: ', receivedData)
 
   if (!fileMetadata) {
     try {
@@ -104,8 +120,22 @@ export function receiveFile(messageEventObject) {
     }
   }
 
-  receivedChunks.push(receivedData)
-  totalBytesReceived += receivedData.size
+  let arrayBuffer
+
+  if (receivedData instanceof Blob) {
+    arrayBuffer = await receivedData.arrayBuffer()
+  } else if (receivedData instanceof ArrayBuffer) {
+    arrayBuffer = receivedData
+  } else {
+    console.log('Unknown data type was received: ', typeof receivedData)
+    return
+  }
+
+  const compressedBytes = new Uint8Array(arrayBuffer)
+  const decompressedBytes = pako.inflate(compressedBytes)
+
+  receivedChunks.push(decompressedBytes.buffer)
+  totalBytesReceived += decompressedBytes.byteLength
   uiUtils.DOM.statsDiv.innerHTML =
     `Received ${totalBytesReceived} bytes of ${fileMetadata.size} - ${Math.round((totalBytesReceived / fileMetadata.size) * 100)}%`
   uiUtils.DOM.receiveProgress.value = totalBytesReceived
@@ -113,7 +143,7 @@ export function receiveFile(messageEventObject) {
   if (totalBytesReceived === fileMetadata.size) {
     uiUtils.logToCustomConsole('All chunks received. Reassembling file.')
 
-    const fileBlobObject = new Blob(receivedChunks, {type: fileMetadata.type})
+    const fileBlobObject = new Blob(receivedChunks, { type: fileMetadata.type })
 
     const downloadURL = URL.createObjectURL(fileBlobObject)
 
@@ -125,7 +155,7 @@ export function receiveFile(messageEventObject) {
     uiUtils.DOM.statsDiv.innerHTML =
       `<strong>Download complete</strong>`
     uiUtils.logToCustomConsole('File successfully received.', constants.myColours.orange)
-    
+
     receivedChunks = []
     totalBytesReceived = 0
     fileMetadata = null
