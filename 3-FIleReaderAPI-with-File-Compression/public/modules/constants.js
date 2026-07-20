@@ -10,7 +10,14 @@ export const myColours = {
 }
 
 export const FILE_CONFIG = {
-  CHUNK_SIZE: 262144,
+  
+  // Use smaller chunk size if compressed chunk size is larger
+  // than the original size. Such cases might happen when 
+  // sending image files. 
+  CHUNK_SIZE: 65536,   
+  
+  // CHUNK_SIZE: 262144,
   LOWER_THRESHOLD: lowerWatermark,
   UPPER_THRESHOLD: highWatermark
+
 }

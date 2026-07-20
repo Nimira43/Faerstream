@@ -41,14 +41,23 @@ export function sendFile(senderDataChannel) {
     const uInt8ArrayChunk = new Uint8Array(arrayBuffer)
     console.log(senderDataChannel.bufferedAmount, ' === bytes buffered in the send queue.')
 
-    const compressedChunk = pako.deflate(uInt8ArrayChunk)
-    console.log('Compressed chunk using pako: ', compressedChunk)
-    console.log('Original chunk size: ', uInt8ArrayChunk.byteLength)
-    console.log('Compressed chunk size: ', compressedChunk.length)
-
     try {
-      senderDataChannel.send(compressedChunk.buffer)
-      offset += readerLoadEvent.target.result.byteLength
+      let dataToSend
+
+      if (file.type.startsWith('image/')) {
+        dataToSend = arrayBuffer
+        console.log('Image detected - sending raw binary data, uncompressed. Size being sent is: ', uInt8ArrayChunk.byteLength)
+      } else {
+        const compressedChunk = pako.deflate(uInt8ArrayChunk)
+        dataToSend = compressedChunk.buffer
+
+        console.log('Compressed chunk using pako: ', compressedChunk)
+        console.log('Original chunk size: ', uInt8ArrayChunk.byteLength)
+        console.log('Compressed chunk size: ', compressedChunk.length)
+      }
+
+      senderDataChannel.send(dataToSend)
+      offset += uInt8ArrayChunk.byteLength
       uiUtils.DOM.sendProgress.value = offset
     } catch (e) {
       console.log('Error reading and sending chunks: ', e)
@@ -131,11 +140,18 @@ export async function receiveFile(messageEventObject) {
     return
   }
 
-  const compressedBytes = new Uint8Array(arrayBuffer)
-  const decompressedBytes = pako.inflate(compressedBytes)
+  if (fileMetadata.type.startsWith('image/')) {
+    receivedChunks.push(arrayBuffer)
+    totalBytesReceived += arrayBuffer.byteLength
+    console.log('Total bytes received from image: ', totalBytesReceived)
+    console.log('Total size of file:', fileMetadata.size)
+  } else {
+    const compressedBytes = new Uint8Array(arrayBuffer)
+    const decompressedBytes = pako.inflate(compressedBytes)
+    receivedChunks.push(decompressedBytes.buffer)
+    totalBytesReceived += decompressedBytes.byteLength
+  }
 
-  receivedChunks.push(decompressedBytes.buffer)
-  totalBytesReceived += decompressedBytes.byteLength
   uiUtils.DOM.statsDiv.innerHTML =
     `Received ${totalBytesReceived} bytes of ${fileMetadata.size} - ${Math.round((totalBytesReceived / fileMetadata.size) * 100)}%`
   uiUtils.DOM.receiveProgress.value = totalBytesReceived
