@@ -14,8 +14,17 @@ export function sendFile(senderDataChannel) {
   uiUtils.logToCustomConsole('Sending file...')
   uiUtils.DOM.abortFileBtn.addEventListener('click', () => {
     webrtc.closeDataChannel(senderDataChannel)
-  }, {once: true})
-  
+  }, { once: true })
+
+  senderDataChannel.addEventListener('bufferedamountlow', () => {
+    if (waitingToDrain) {
+      waitingToDrain = false
+      console.log('bufferedamount event fired, resume sending...')
+      console.log('Offest value: ', offset)
+      pump()
+    }
+  })
+
   const file = uiUtils.DOM.fileUploadInput.files[0]
   console.log('File selected: ', uiUtils.DOM.fileUploadInput.files)
   console.table([file], ['name', 'size', 'type'])
@@ -33,58 +42,21 @@ export function sendFile(senderDataChannel) {
 
   uiUtils.DOM.sendProgress.max = file.size
 
-  fileReader = new FileReader()
-  fileReader.addEventListener('error', error => console.error('Error reading file:', error))
-  fileReader.addEventListener('abort', event => console.log('File reading aborted:', event))
-  fileReader.addEventListener('load', readerLoadEvent => {
-    const arrayBuffer = readerLoadEvent.target.result
-    const uInt8ArrayChunk = new Uint8Array(arrayBuffer)
-    console.log(senderDataChannel.bufferedAmount, ' === bytes buffered in the send queue.')
-
-    try {
-      let dataToSend
-
-      if (file.type.startsWith('image/')) {
-        dataToSend = arrayBuffer
-        console.log('Image detected - sending raw binary data, uncompressed. Size being sent is: ', uInt8ArrayChunk.byteLength)
-      } else {
-        const compressedChunk = pako.deflate(uInt8ArrayChunk)
-        dataToSend = compressedChunk.buffer
-
-        console.log('Compressed chunk using pako: ', compressedChunk)
-        console.log('Original chunk size: ', uInt8ArrayChunk.byteLength)
-        console.log('Compressed chunk size: ', compressedChunk.length)
-      }
-
-      senderDataChannel.send(dataToSend)
-      offset += uInt8ArrayChunk.byteLength
-      uiUtils.DOM.sendProgress.value = offset
-    } catch (e) {
-      console.log('Error reading and sending chunks: ', e)
-      return
-    } 
-
-    if (offset < file.size && !waitingToDrain) {
-      readChunk()
-    } else {
-      console.log(`End of File.`)
-      uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
-      webrtc.closeDataChannel(senderDataChannel)
-    }
-  })
-
+  let offset = 0
+  let upperThreshold = constants.FILE_CONFIG.UPPER_THRESHOLD
+  senderDataChannel.bufferedAmountLowThreshold = constants.FILE_CONFIG.LOWER_THRESHOLD
+  let waitingToDrain = false
+  
+  const reader = file.stream().getReader({mode: 'byob'})
+  
   const chunkSize = Math.min(
     constants.FILE_CONFIG.CHUNK_SIZE,
     senderDataChannel.maxMessageSize
   )
 
-  let offset = 0
-  let upperThreshold = constants.FILE_CONFIG.UPPER_THRESHOLD
-  senderDataChannel.bufferedAmountLowThreshold = constants.FILE_CONFIG.LOWER_THRESHOLD
-  let waitingToDrain = false
-
-  function readChunk() {
-    console.log('Reading chunk starting at offset:', offset)
+  async function pump() {
+    console.log('Reading chunk starting at offest: ', offset)
+    console.log('Buffered Amount: ', senderDataChannel.bufferedAmount)
 
     if (senderDataChannel.bufferedAmount >= upperThreshold) {
       waitingToDrain = true
@@ -92,22 +64,26 @@ export function sendFile(senderDataChannel) {
       return
     }
 
-    const chunk = file.slice(offset, offset + chunkSize)
+    const { done, value } = await reader.read(new Uint8Array(chunkSize))
 
-    fileReader.readAsArrayBuffer(chunk)
-    console.log('Blob Chunk: ', chunk)
-  }
-
-  senderDataChannel.addEventListener('bufferedamountlow', () => {
-    if (waitingToDrain) {
-      waitingToDrain = false
-      console.log('bufferedamount event fired, resume sending...')
-      console.log('Offest value: ', offset)
-      readChunk()
+    if (done) {
+      uiUtils.logToCustomConsole('File successfully sent.', constants.myColours.darkGreen)
+      webrtc.closeDataChannel(senderDataChannel)
+      return
     }
-  })
 
-  readChunk()
+    try {
+      console.log('Value of the Stream API: ', value)
+      senderDataChannel.send(value)
+      offset += value.byteLength
+      uiUtils.DOM.sendProgress.value = offset
+    } catch (e) {
+      console.error('Error sending chunk:', e)
+      return
+    }
+    pump()
+  }
+   pump()
 }
 
 export async function receiveFile(messageEventObject) {
@@ -120,7 +96,8 @@ export async function receiveFile(messageEventObject) {
       uiUtils.logToCustomConsole('Received file metadata.')
       console.log('File meta object: ', fileMetadata)
       const encode = new TextEncoder().encode(receivedData)
-      console.log('Size of mesage received: ', encode.length)
+      const encode2 = new TextEncoder().encode(fileMetadata)
+      console.log('Size of message received: ', encode.length)
       uiUtils.DOM.receiveProgress.max = fileMetadata.size
       return
     } catch (e) {
@@ -128,29 +105,9 @@ export async function receiveFile(messageEventObject) {
       return
     }
   }
-
-  let arrayBuffer
-
-  if (receivedData instanceof Blob) {
-    arrayBuffer = await receivedData.arrayBuffer()
-  } else if (receivedData instanceof ArrayBuffer) {
-    arrayBuffer = receivedData
-  } else {
-    console.log('Unknown data type was received: ', typeof receivedData)
-    return
-  }
-
-  if (fileMetadata.type.startsWith('image/')) {
-    receivedChunks.push(arrayBuffer)
-    totalBytesReceived += arrayBuffer.byteLength
-    console.log('Total bytes received from image: ', totalBytesReceived)
-    console.log('Total size of file:', fileMetadata.size)
-  } else {
-    const compressedBytes = new Uint8Array(arrayBuffer)
-    const decompressedBytes = pako.inflate(compressedBytes)
-    receivedChunks.push(decompressedBytes.buffer)
-    totalBytesReceived += decompressedBytes.byteLength
-  }
+ 
+  receivedChunks.push(receivedData)
+  totalBytesReceived += receivedData.byteLength
 
   uiUtils.DOM.statsDiv.innerHTML =
     `Received ${totalBytesReceived} bytes of ${fileMetadata.size} - ${Math.round((totalBytesReceived / fileMetadata.size) * 100)}%`

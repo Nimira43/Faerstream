@@ -120,7 +120,7 @@ export async function receiveFile(messageEventObject) {
       uiUtils.logToCustomConsole('Received file metadata.')
       console.log('File meta object: ', fileMetadata)
       const encode = new TextEncoder().encode(receivedData)
-      console.log('Size of mesage received: ', encode.length)
+      console.log('Size of message received: ', encode.length)
       uiUtils.DOM.receiveProgress.max = fileMetadata.size
       return
     } catch (e) {
